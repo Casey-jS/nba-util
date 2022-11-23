@@ -4,3 +4,4 @@ CREATE TABLE Players(
     fname text not null,
     lname text not null
 );
+
