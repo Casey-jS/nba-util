@@ -1,24 +1,16 @@
-from bs4 import BeautifulSoup as bs
-import requests as r
-from dataclasses import dataclass
+from nba_api.stats.static import players
+from nba_api.stats.endpoints import commonplayerinfo as common
 
-def get_stat():
-    pass
+players_dict = players.get_active_players()
 
-def get_query_string(first, last):
+def get_player(name):
 
-    query_string = "/players/" + last[0].lower() + "/"
-    if len(last) < 5:
-        first_name_length = 7 - len(last)
-        query_string += last[0:len(last)] + first[0:first_name_length] + "01.html"
-    
-    else:
-        query_string += last[0:5] + first[0:2] + "01.html"
-    new_qs = query_string.lower()
-    return new_qs
+    player_df = [player for player in players_dict if player['full_name']== name][0]
+    return player_df
 
-print(get_query_string("Lebron", "James"))
 
+player = get_player("Damian Lillard")
+print(player["last_name"])
 
 
     
