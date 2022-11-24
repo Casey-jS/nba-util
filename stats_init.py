@@ -38,11 +38,11 @@ def create_stat_db():
     for player_stats in player_set:
         id = player_stats[0]
         name = player_stats[1]
-        ppg = get_stat(id, "PTS")
-        apg = get_stat(id, "AST")
-        rpg = get_stat(id, "REB")
-        spg = get_stat(id, "STL")
-        bpg = get_stat(id, "BLK")
+        ppg = round(get_stat(id, "PTS"), 2)
+        apg = round(get_stat(id, "AST"), 2)
+        rpg = round(get_stat(id, "REB"), 2)
+        spg = round(get_stat(id, "STL"), 2)
+        bpg = round(get_stat(id, "BLK"), 2)
 
         insert_string = "INSERT INTO PlayerStats (id, fullName, ppg, apg, rpg, spg, bpg) VALUES (?, ?, ?, ?, ?, ?, ?)"
         db.execute(insert_string, (id, name, ppg, apg, rpg, spg, bpg))
@@ -67,7 +67,9 @@ def test_get_stats(name):
     for i in range(6):
         print(format[i] + str(stats[i]))
 
-test_get_stats("Dwight Howard")
+
+test_get_stats("Shai Gilgeous-Alexander")
+
 
 
 

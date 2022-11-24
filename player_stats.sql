@@ -7,4 +7,4 @@ CREATE TABLE PlayerStats(
     rpg decimal not null,
     spg decimal not null,
     bpg decimal not null
-)
+);
