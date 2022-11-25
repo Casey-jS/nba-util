@@ -1,7 +1,6 @@
 import sqlite3
 import pandas as pd
 from nba_api.stats.endpoints import leaguedashplayerstats
-import pprint
 
 player_set = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["rowSet"]
 

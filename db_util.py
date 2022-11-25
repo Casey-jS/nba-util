@@ -1,4 +1,16 @@
 import sqlite3
+import json
+
+
+column_names = [
+    "id",
+    "fullName",
+    "ppg",
+    "apg",
+    "rpg",
+    "spg",
+    "bpg"
+]
 
 def get_db():
     db = sqlite3.connect("player_stats.db")
@@ -31,26 +43,29 @@ def get_id(name):
 
 # maybe add capability to filter by position
 # string passed in should be column name
-def get_league_leaders(stat):
+def get_league_leaders(stat) -> list[dict]:
     db = get_db()
     cursor = db.cursor()
+    players = []
+    query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 10"
+    top10 = cursor.execute(query).fetchall()
+    cursor.close()
+    db.close()
 
-    query = "SELECT * FROM PlayerStats ORDER BY ppg desc LIMIT 10"
-    leader_ids = cursor.execute(query).fetchall()
-    return leader_ids
+    lst = []
+    for player in top10:
+        player_dict = dict_from_row(player)
+        lst.append(player_dict)
+    
+    return lst
+
+def dict_from_row(row):
+    return dict(zip(row.keys(), row))
 
 
-ppg_leaders = get_league_leaders("ppg")
+def get_data_json(data):
+    return json.dumps(data)
 
-for i in range(10):
-    player = ppg_leaders[i]
-
-    fullName = player[1]
-    ppg = player[2]
-    print(fullName, end = "\n\n")
-    print("ID: " + str(player[0]))
-
-    print("PPG: " + str(ppg), end = "\n\n")
 
 
 
