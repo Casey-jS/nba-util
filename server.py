@@ -1,15 +1,19 @@
-from flask import Flask, render_template, request
-import db_util
+from flask import Flask, request, jsonify
+import db_util as db_util
 
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/top10/<stat>/", methods=["GET"])
 
-def top_10_ppg(methods=["POST", "GET"]):
+def top_10_ppg(stat):
+    print(stat)
     if request.method == "GET":
-        top_scorers = db_util.get_league_leaders("ppg")
-        js = db_util.get_data_json(top_scorers)
-        return js
+        top_scorers = db_util.get_league_leaders(stat)
+        response = jsonify(top_scorers)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+
         
 

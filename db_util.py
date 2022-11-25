@@ -43,10 +43,13 @@ def get_id(name):
 
 # maybe add capability to filter by position
 # string passed in should be column name
+
+def dict_from_row(row):
+    return dict(zip(row.keys(), row))
+
 def get_league_leaders(stat) -> list[dict]:
     db = get_db()
     cursor = db.cursor()
-    players = []
     query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 10"
     top10 = cursor.execute(query).fetchall()
     cursor.close()
@@ -59,8 +62,7 @@ def get_league_leaders(stat) -> list[dict]:
     
     return lst
 
-def dict_from_row(row):
-    return dict(zip(row.keys(), row))
+
 
 
 def get_data_json(data):

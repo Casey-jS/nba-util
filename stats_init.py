@@ -49,7 +49,7 @@ def create_stat_db():
     db.close()
 
 
-# create_stat_db()
+create_stat_db()
 
 def get_db():
     db = sqlite3.connect("player_stats.db")
@@ -67,7 +67,6 @@ def test_get_stats(name):
         print(format[i] + str(stats[i]))
 
 
-test_get_stats("Shai Gilgeous-Alexander")
 
 
 
