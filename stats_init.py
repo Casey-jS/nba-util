@@ -24,7 +24,10 @@ def get_stat(id, stat_str):
             games_played = player_info[6]          # divide it by games played to get the average
             rstat = total_rstat / games_played
             break
-    
+    if "." not in str(rstat):
+        str_stat = str(rstat)
+        str_stat += ".0"
+        rstat = float(str_stat)
     return rstat
 def create_stat_db():
     db = sqlite3.connect("player_stats.db")
@@ -37,11 +40,11 @@ def create_stat_db():
     for player_stats in player_set:
         id = player_stats[0]
         name = player_stats[1]
-        ppg = round(get_stat(id, "PTS"), 2)
-        apg = round(get_stat(id, "AST"), 2)
-        rpg = round(get_stat(id, "REB"), 2)
-        spg = round(get_stat(id, "STL"), 2)
-        bpg = round(get_stat(id, "BLK"), 2)
+        ppg = round(get_stat(id, "PTS"), 1)
+        apg = round(get_stat(id, "AST"), 1)
+        rpg = round(get_stat(id, "REB"), 1)
+        spg = round(get_stat(id, "STL"), 1)
+        bpg = round(get_stat(id, "BLK"), 1)
 
         insert_string = "INSERT INTO PlayerStats (id, fullName, ppg, apg, rpg, spg, bpg) VALUES (?, ?, ?, ?, ?, ?, ?)"
         db.execute(insert_string, (id, name, ppg, apg, rpg, spg, bpg))
@@ -49,7 +52,7 @@ def create_stat_db():
     db.close()
 
 
-create_stat_db()
+# create_stat_db()
 
 def get_db():
     db = sqlite3.connect("player_stats.db")
@@ -63,9 +66,10 @@ def test_get_stats(name):
 
     format = ["ID: ", "Name: ", "PPG: ", "APG: ", "RPG: ", "SPG: ", "BPG: "]
 
-    for i in range(6):
+    for i in range(7):
         print(format[i] + str(stats[i]))
 
+test_get_stats("Luka Doncic")
 
 
 

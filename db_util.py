@@ -62,7 +62,18 @@ def get_league_leaders(stat) -> list[dict]:
     
     return lst
 
-
+def get_teams():
+    db = sqlite3.connect("team_stats.db")
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    query = "SELECT * FROM TeamStats ORDER BY wrank desc"
+    teams = cursor.execute(query).fetchall()
+    cursor.close()
+    lst = []
+    for team in teams:
+        team_dict = dict_from_row(team)
+        lst.append(team_dict)
+    return lst
 
 
 def get_data_json(data):

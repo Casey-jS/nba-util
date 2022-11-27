@@ -1,4 +1,3 @@
-import db_util as db
 
 stat_map = {
     "PTS" : 2,
@@ -17,7 +16,6 @@ def get_stat(stat, playerID):
     return float(player[stat_index])
 
 
-lebron = get_stat("REB", 2544)
 
 
 
