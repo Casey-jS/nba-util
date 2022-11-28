@@ -50,13 +50,13 @@ def dict_from_row(row):
 def get_league_leaders(stat) -> list[dict]:
     db = get_db()
     cursor = db.cursor()
-    query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 10"
-    top10 = cursor.execute(query).fetchall()
+    query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 30"
+    top30 = cursor.execute(query).fetchall()
     cursor.close()
     db.close()
 
     lst = []
-    for player in top10:
+    for player in top30:
         player_dict = dict_from_row(player)
         lst.append(player_dict)
     
@@ -66,7 +66,7 @@ def get_teams():
     db = sqlite3.connect("team_stats.db")
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
-    query = "SELECT * FROM TeamStats ORDER BY wrank desc"
+    query = "SELECT * FROM TeamStats ORDER BY wrank asc"
     teams = cursor.execute(query).fetchall()
     cursor.close()
     lst = []

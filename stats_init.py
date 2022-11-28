@@ -4,9 +4,22 @@ from nba_api.stats.endpoints import leaguedashplayerstats
 
 player_set = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["rowSet"]
 
+# keys = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["headers"]
+
+""" i = 0
+
+for key in keys:
+    print(str(i) + ": " + key)
+    i += 1 """
+
 def get_stat(id, stat_str):
 
     statDict = {
+        "TEAM" : 3,
+        "AGE" : 4,
+        "GP" : 5,
+        "FGPCT" : 12,
+        "FG3PCT" : 15,
         "PTS" : 30,
         "AST" : 23,
         "REB" : 22,
@@ -45,9 +58,15 @@ def create_stat_db():
         rpg = round(get_stat(id, "REB"), 1)
         spg = round(get_stat(id, "STL"), 1)
         bpg = round(get_stat(id, "BLK"), 1)
+        team = player_stats[4]
+        gp = player_stats[6]
+        fgpct = player_stats[13] * 100
+        fg3pct = player_stats[16] * 100
+        ftpct = player_stats[19] * 100
+        age = player_stats[5]
 
-        insert_string = "INSERT INTO PlayerStats (id, fullName, ppg, apg, rpg, spg, bpg) VALUES (?, ?, ?, ?, ?, ?, ?)"
-        db.execute(insert_string, (id, name, ppg, apg, rpg, spg, bpg))
+        insert_string = "INSERT INTO PlayerStats (id, fullName, team, games, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        db.execute(insert_string, (id, name, team, gp, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct))
         db.commit()
     db.close()
 
@@ -64,12 +83,12 @@ def test_get_stats(name):
 
     stats = db.execute("SELECT * FROM PlayerStats WHERE fullName = ?", (name,)).fetchone()
 
-    format = ["ID: ", "Name: ", "PPG: ", "APG: ", "RPG: ", "SPG: ", "BPG: "]
+    format = ["ID: ", "Name: ", "TEAM: ", "GP: ", "AGE: ", "PPG: ", "APG: ", "RPG: ", "SPG: ", "BPG: ", "FG%: ", "3P%: ", "FT%: "]
 
-    for i in range(7):
+    for i in range(13):
         print(format[i] + str(stats[i]))
 
-test_get_stats("Luka Doncic")
+test_get_stats("Luke Kennard")
 
 
 

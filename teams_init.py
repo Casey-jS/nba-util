@@ -13,10 +13,10 @@ def create_team_db():
         name = team[1]
         wins = team[3] 
         losses = team[4]
-        win_pct = round(team[5], 1) * 100 # to format into a pct
-        three_pct = round(team[12], 1) * 100 # to format into a pct
+        win_pct = round(team[5], 3) * 100 # to format into a pct
+        ppg = round(team[12], 3) * 100 # to format into a pct
         plusminus = team[27]
-        ppg = round((team[26] / (wins + losses)), 1)
+        three_pct = round((team[26] / (wins + losses)), 2)
         rank = team[29]
 
         insert_string = "INSERT INTO TeamStats (id, teamName, wins, losses, wpct, ppg, fg3pct, plusminus, wrank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -24,6 +24,13 @@ def create_team_db():
         db.commit()
 
 team_set = leaguedashteamstats.LeagueDashTeamStats().get_dict()["resultSets"][0]['rowSet']
+
+""" i = 0
+for key in team_set:
+    print(str(i) + ": " + key)
+    i += 1 """
+
+
 
 
 def get_team_stat(teamID, stat):
@@ -64,6 +71,6 @@ def test_get_stats(team_name):
     for i in range(9):
         print(format[i] + str(stats[i]))
 
-test_get_stats("Phoenix Suns")
+# test_get_stats("Phoenix Suns")
 
-# create_team_db()
+create_team_db()
