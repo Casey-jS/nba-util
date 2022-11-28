@@ -3,8 +3,8 @@ from nba_api.stats.endpoints import leaguedashteamstats
 
 
 def create_team_db():
-    db = sqlite3.connect("team_stats.db")
-    with open("team_stats.sql") as f:
+    db = sqlite3.connect("databases/team_stats.db")
+    with open("databases/team_stats.sql") as f:
         db.executescript(f.read())
     db.row_factory = sqlite3.Row
 
@@ -57,7 +57,7 @@ def get_team_stat(teamID, stat):
 
 
 def get_db():
-    db = sqlite3.connect("team_stats.db")
+    db = sqlite3.connect("databases/team_stats.db")
     db.row_factory = sqlite3.Row
     return db
 
@@ -71,6 +71,6 @@ def test_get_stats(team_name):
     for i in range(9):
         print(format[i] + str(stats[i]))
 
-# test_get_stats("Phoenix Suns")
+test_get_stats("Phoenix Suns")
 
-create_team_db()
+# create_team_db()

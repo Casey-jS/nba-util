@@ -1,19 +1,8 @@
 import sqlite3
 import json
 
-
-column_names = [
-    "id",
-    "fullName",
-    "ppg",
-    "apg",
-    "rpg",
-    "spg",
-    "bpg"
-]
-
 def get_db():
-    db = sqlite3.connect("player_stats.db")
+    db = sqlite3.connect("databases/player_stats.db")
     db.row_factory = sqlite3.Row
     return db
 
@@ -32,6 +21,7 @@ def get_player(id):
     db.close()
     return player
 
+
 def get_id(name):
     db = get_db()
     cursor = db.cursor()
@@ -40,9 +30,6 @@ def get_id(name):
 
     cursor.close()
     return id[0]
-
-# maybe add capability to filter by position
-# string passed in should be column name
 
 def dict_from_row(row):
     return dict(zip(row.keys(), row))
@@ -63,7 +50,7 @@ def get_league_leaders(stat) -> list[dict]:
     return lst
 
 def get_teams():
-    db = sqlite3.connect("team_stats.db")
+    db = sqlite3.connect("databases/team_stats.db")
     db.row_factory = sqlite3.Row
     cursor = db.cursor()
     query = "SELECT * FROM TeamStats ORDER BY wrank asc"

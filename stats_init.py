@@ -1,5 +1,4 @@
 import sqlite3
-import pandas as pd
 from nba_api.stats.endpoints import leaguedashplayerstats
 
 player_set = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["rowSet"]
@@ -43,9 +42,9 @@ def get_stat(id, stat_str):
         rstat = float(str_stat)
     return rstat
 def create_stat_db():
-    db = sqlite3.connect("player_stats.db")
+    db = sqlite3.connect("databases/player_stats.db")
 
-    with open("player_stats.sql") as f:
+    with open("databases/player_stats.sql") as f:
         db.executescript(f.read())
 
     db.row_factory = sqlite3.Row
@@ -71,10 +70,10 @@ def create_stat_db():
     db.close()
 
 
-# create_stat_db()
+create_stat_db()
 
 def get_db():
-    db = sqlite3.connect("player_stats.db")
+    db = sqlite3.connect("databases/player_stats.db")
     db.row_factory = sqlite3.Row
     return db
 
