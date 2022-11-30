@@ -25,13 +25,28 @@ def teams():
         response.headers.add(stupid_cors, "*")
         return response
 
-""" @app.route("/players/<id:int>/")
 
-def player(id):
+@app.route("/teams/<teamID>/")
+
+def get_roster(teamID):
     if request.method == "GET":
-        player = db_util.get_player(id)
-        response = jsonify(player)
-        response.headers.add(stupid_cors, "*") """
+        roster = db_util.get_roster(teamID)
+        response = jsonify(roster)
+        response.headers.add(stupid_cors, "*")
+        return response
+@app.route("/validateuser/", methods="Post")
+
+def validate_user():
+    if request.method == "POST":
+        data = request.json
+        userName = data["username"]
+        password = data["password"]
+
+
+def valid_user(username, password):
+    
+    
+
 
 
         

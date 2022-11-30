@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS Users;
 CREATE TABLE Users(
-    id int not null,
+    id int primary key,
     userName text not null,
-    email text not null,
     password text not null
 );

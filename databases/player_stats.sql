@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS PlayerStats;
 CREATE TABLE PlayerStats(
     id int primary key,
     fullName text not null,
+    teamID int not null,
+    fantasyRank int not null,
     team text not null,
     games int not null,
     age int not null,

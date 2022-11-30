@@ -63,9 +63,11 @@ def create_stat_db():
         fg3pct = player_stats[16] * 100
         ftpct = player_stats[19] * 100
         age = player_stats[5]
+        teamID = player_stats[3]
+        fantasyRank = player_stats[62]
 
-        insert_string = "INSERT INTO PlayerStats (id, fullName, team, games, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        db.execute(insert_string, (id, name, team, gp, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct))
+        insert_string = "INSERT INTO PlayerStats (id, fullName, teamID, fantasyRank, team, games, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        db.execute(insert_string, (id, name, teamID, fantasyRank, team, gp, age, ppg, apg, rpg, spg, bpg, fgpct, fg3pct, ftpct))
         db.commit()
     db.close()
 
@@ -82,12 +84,12 @@ def test_get_stats(name):
 
     stats = db.execute("SELECT * FROM PlayerStats WHERE fullName = ?", (name,)).fetchone()
 
-    format = ["ID: ", "Name: ", "TEAM: ", "GP: ", "AGE: ", "PPG: ", "APG: ", "RPG: ", "SPG: ", "BPG: ", "FG%: ", "3P%: ", "FT%: "]
+    format = ["ID: ", "Name: ", "TeamID: ", "Fantasy Rank: ", "TEAM: ", "GP: ", "AGE: ", "PPG: ", "APG: ", "RPG: ", "SPG: ", "BPG: ", "FG%: ", "3P%: ", "FT%: "]
 
-    for i in range(13):
+    for i in range(15):
         print(format[i] + str(stats[i]))
 
-test_get_stats("Luke Kennard")
+test_get_stats("Anthony Davis")
 
 
 
