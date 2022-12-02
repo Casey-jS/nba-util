@@ -7,11 +7,6 @@ def get_db(database):
     return db
 
 
-def get_player(id):
-    db = get_db("player_stats")
-    player = db.execute("SELECT * FROM PlayerStats WHERE id = ?", (id,)).fetchone()
-    db.close()
-    return player
 
 
 def get_id(name):
@@ -65,6 +60,14 @@ def get_roster(teamID):
         lst.append(roster_dict)
 
     return lst
+
+def get_player_by_id(id):
+    db = get_db("player_stats")
+    cursor = db.cursor()
+    player = cursor.execute("SELECT * FROM PlayerStats WHERE id = ?", (id,)).fetchone()
+    db.close()
+    player_dict = dict_from_row(player)
+    return player_dict
 
 def connect_users():
     db = sqlite3.connect("databases/users.db")
