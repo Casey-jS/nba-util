@@ -1,5 +1,10 @@
 from flask import Flask, request, jsonify
 import db_util as db_util
+from flask_cors import CORS
+import gamelogs
+
+app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 app = Flask(__name__)
 
@@ -42,20 +47,28 @@ def get_roster(teamID):
         response = jsonify(roster)
         response.headers.add(stupid_cors, "*")
         return response
-@app.route("/validateuser/", methods=["Post"])
+@app.route("/validateuser/", methods=["POST", "GET"])
 
 def validate_user():
     if request.method == "POST":
         data = request.json
         userName = data["username"]
         password = data["password"]
-
+        print("Got username " + userName + " and password " + password)
         
         valid: bool = db_util.user_exists(userName) and db_util.validate_user(userName, password)
         dict_to_send = {"is_valid" : valid}
         json_to_send = jsonify(dict_to_send)
-        print(json_to_send)
         return json_to_send
+
+@app.route("/last5/<playerID>/", methods=["GET"])
+
+def last_5_games(playerID):
+    if request.method == "GET":
+        last5_list = gamelogs.get_game_logs(playerID)
+        response = jsonify(last5_list)
+        return response
+
 
 
     
