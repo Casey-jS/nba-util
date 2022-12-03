@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS GameLog;
-CREATE TABLE GameLog(
+DROP TABLE IF EXISTS GameLogs;
+CREATE TABLE GameLogs(
     playerID int not null,
     opp text not null,
     wl text not null,

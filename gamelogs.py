@@ -5,7 +5,7 @@ import sqlite3
 def create_gamelogs_db():
     db = sqlite3.connect("databases/game_logs.db")
 
-    with open("databases/game_log.sql") as f:
+    with open("databases/game_logs.sql") as f:
         db.executescript(f.read())
 
     db.row_factory = sqlite3.Row
