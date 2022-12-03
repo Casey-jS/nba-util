@@ -13,7 +13,8 @@ def dict_from_row(row):
 def get_last5_for_player(playerID):
     db = get_db()
     cursor = db.cursor()
-    logs = cursor.execute("SELECT * FROM GameLog WHERE playerID = ?", (playerID,)).fetchall()
+    logs = cursor.execute("SELECT * FROM GameLogs WHERE playerID = ?", (playerID,)).fetchall()
+    print(len(logs))
     lst = []
     cursor.close()
     for game in logs:

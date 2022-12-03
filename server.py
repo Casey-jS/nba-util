@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
 import db_util as db_util
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import gamelogs
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/.*": {"origins": "http://localhost"}})
 
-app = Flask(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['CORS_SUPPORTS_CREDENTIALS'] = True
 
 stupid_cors = "Access-Control-Allow-Origin"
 
@@ -47,7 +48,8 @@ def get_roster(teamID):
         response = jsonify(roster)
         response.headers.add(stupid_cors, "*")
         return response
-@app.route("/validateuser/", methods=["POST", "GET"])
+@app.route("/validateuser/", methods=["POST", "GET", "OPTIONS"])
+@cross_origin(origins='*')
 
 def validate_user():
     if request.method == "POST":
@@ -55,8 +57,8 @@ def validate_user():
         userName = data["username"]
         password = data["password"]
         print("Got username " + userName + " and password " + password)
-        
         valid: bool = db_util.user_exists(userName) and db_util.validate_user(userName, password)
+        print("User is valid: ", valid)
         dict_to_send = {"is_valid" : valid}
         json_to_send = jsonify(dict_to_send)
         return json_to_send
@@ -68,6 +70,15 @@ def last_5_games(playerID):
         last5_list = gamelogs.get_game_logs(playerID)
         response = jsonify(last5_list)
         return response
+
+
+@app.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
+    return response
 
 
 

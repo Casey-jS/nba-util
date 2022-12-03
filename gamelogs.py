@@ -51,5 +51,5 @@ def get_game_log_for_player(playerID, game_number) -> dict:
 
     return game_dict
 
-
-create_gamelogs_db()
+print(get_game_log_for_player(203507, 1))
+# create_gamelogs_db()

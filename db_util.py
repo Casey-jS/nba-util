@@ -78,7 +78,6 @@ def user_exists(username):
     cursor = db.cursor()
 
     user = cursor.execute("SELECT 1 FROM Users WHERE userName = ?", (username,))
-    cursor.close()
     if user.fetchone():
         return True
     return False
