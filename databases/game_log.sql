@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS GameLog;
 CREATE TABLE GameLog(
+    playerID int not null,
     opp text not null,
     wl text not null,
     minPlayed decimal not null,
