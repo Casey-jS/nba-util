@@ -3,9 +3,9 @@ from nba_api.stats.endpoints import leaguedashplayerstats
 
 player_set = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["rowSet"]
 
-# keys = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["headers"]
+""" keys = leaguedashplayerstats.LeagueDashPlayerStats().get_dict()["resultSets"][0]["headers"]
 
-""" i = 0
+i = 0
 
 for key in keys:
     print(str(i) + ": " + key)
@@ -72,7 +72,7 @@ def create_stat_db():
     db.close()
 
 
-create_stat_db()
+#create_stat_db()
 
 def get_db():
     db = sqlite3.connect("databases/player_stats.db")

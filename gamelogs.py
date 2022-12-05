@@ -1,55 +1,113 @@
 from nba_api.stats.endpoints import playergamelogs
 from nba_api.stats.static import players
 import sqlite3
+import time
 
-def create_gamelogs_db():
-    db = sqlite3.connect("databases/game_logs.db")
 
-    with open("databases/game_logs.sql") as f:
-        db.executescript(f.read())
+headers =  {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+            "Accept-Encoding": "gzip",
+            "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+        }
 
-    db.row_factory = sqlite3.Row
-
-    all_game_logs = get_game_logs()
-
-    insert_string = "INSERT INTO GameLogs (playerID, opp, wl, minPlayed, fg, threes, reb, ast, stl, blk, fpts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    
-    for game in all_game_logs:
-        db.execute(insert_string, (game['id'], game['opp'], game['wl'], game['min'], game['fg'], game['3p'], game['reb'], game['ast'], game['stl'], game['blk'], game['fpts']))
-        db.commit()
-
-    db.close()
-
-def get_game_logs():
-    
-    players_list = players.get_active_players()
+def get_last5(id):
     lst = []
+    for i in range(5):
 
-    for i in range(len(players_list)):
-        player_id = players_list[i]['id']
-        for j in range(5):
-            game = get_game_log_for_player(player_id, j)
-            lst.append(game)
+        
+
+        
+        log = playergamelogs.PlayerGameLogs(player_id_nullable=2544, headers = headers, timeout=100).get_dict()['resultSets'][0]['rowSet'][i]
+        print("got a game log")
+        game_dict = {
+            "result" : log[5],
+            "opp" : log[4][-3:],
+            "pts" : log[24],
+            "fg" : str(log[7]) + "/" + str(log[8]),
+            "fg3" : str(log[10]) + "/" + str(log[11]),
+            "reb" : log[18],
+            "ast" : log[19],
+            "stl" : log[20],
+            "blk" : log[21]
+        }
+        lst.append(game_dict)
+
+        time.sleep(.6)
+
     return lst
 
-def get_game_log_for_player(playerID, game_number) -> dict:
+"""
+playerID int not null,
+opp text not null,
+wl text not null,
+fg text not null,
+threes text not null,
+reb int not null,
+ast int not null,
+stl int not null,
+blk int not null
+"""
 
-    game = playergamelogs.PlayerGameLogs(season_nullable='2022-23', player_id_nullable=playerID).get_dict()["resultSets"][0]["rowSet"][game_number]
-    game_dict = {
-        "id" : game[1],
-        "opp" : game[9].split(' ')[2],
-        "wl" : game[10],
-        "min": game[11],
-        "fg" : str(game[12]) + "/" + str(game[13]),
-        "3p" : str(game[15]) + "/" + str(game[16]),
-        "reb" : game[23],
-        "ast" : game[24],
-        "stl" : game[26],
-        "blk" : game[27],
-        "fpts" : game[33]
-    }
+def create_logs_db():
+    
+    db = sqlite3.connect('databases/game_logs.db')
+    with open('databases/game_logs.sql') as f:
+        db.executescript(f.read())
 
-    return game_dict
+    insert_string = "INSERT INTO GameLogs (playerID, opp, wl, pts, fg, threes, reb, ast, stl, blk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    with open('active_ids.txt', 'r') as fp:
+        id = fp.readline()
+        while id:
+            last5 = get_last5(int(id))
+            for game in last5:
+                res = game["result"]
+                opp = game['opp']
+                pts = game['pts']
+                fg = game['fg']
+                fg3 = game['fg3']
+                reb = game['reb']
+                ast = game['ast']
+                stl = game['stl']
+                blk = game['blk']
 
-print(get_game_log_for_player(203507, 1))
-# create_gamelogs_db()
+                db.execute(insert_string, (int(id), opp, res, pts, fg, fg3, reb, ast, stl, blk))
+    db.commit()
+    db.close()
+
+# create_logs_db()
+
+def get_active_ids():
+    db = sqlite3.connect('databases/player_stats.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    ids = cursor.execute("SELECT ID FROM PlayerStats WHERE games > 4").fetchall()
+
+    for id in ids:
+        print(id[0])
+
+def view_db():
+    db = sqlite3.connect('databases/game_logs.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    count = cursor.execute("SELECT COUNT(*) playerID from GameLogs").fetchone()[0]
+    print(count)
+
+# view_db()
+
+print(get_last5(2544))
+
+
+
+
+
+
+
+
+
+
+
+

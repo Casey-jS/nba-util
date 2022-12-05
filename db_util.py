@@ -7,17 +7,6 @@ def get_db(database):
     return db
 
 
-
-
-def get_id(name):
-    db = get_db("player_stats")
-    cursor = db.cursor()
-    query = "SELECT * FROM PlayerStats WHERE fullName = ?"
-    id = cursor.execute(query, (name,)).fetchone()
-
-    cursor.close()
-    return id[0]
-
 def dict_from_row(row):
     return dict(zip(row.keys(), row))
 
@@ -76,11 +65,14 @@ def connect_users():
 def user_exists(username):
     db = connect_users()
     cursor = db.cursor()
-
-    user = cursor.execute("SELECT 1 FROM Users WHERE userName = ?", (username,))
-    if user.fetchone():
-        return True
-    return False
+    print("Checking if user " + username + " exists")
+    cursor.execute("SELECT count(*) FROM Users WHERE userName = ?", (username,))
+    data = cursor.fetchone()[0]
+    if data == 0:
+        print("User " + username + " does not exist")
+        return False
+    print("User exists")
+    return True
 
 
 
@@ -96,15 +88,71 @@ def validate_user(username, password):
 def get_data_json(data):
     return json.dumps(data)
 
-def get_new_id():
+def get_new_id() -> int:
     db = connect_users()
     cursor = db.cursor()
 
     maxID = cursor.execute("SELECT 1 id FROM Users order by id desc").fetchone()
+
+    if len(maxID) == 0:
+        return 
+
     return maxID[0] + 1
 
+def new_fav_player(user, player):
+    db = sqlite3.connect('databases/fav_players.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO FavPlayers (userName, playerID) VALUES (?, ?)", (user, player))
+    db.commit()
+    db.close()
 
-print(get_new_id())
+def get_fav_players(userName):
+    db = sqlite3.connect('databases/fav_players.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    players = cursor.execute("SELECT * FROM FavPlayers WHERE userName = ?", (userName,)).fetchall()
+
+    if len(players) == 0:
+        return None
+    lst = []
+    for player in players:
+        player_id = dict_from_row(player)['playerID']
+        lst.append(player_id)
+
+    stats = []
+    for id in lst:
+        playerStats = get_stats_for_player(id)
+        stats.append(playerStats)
+
+
+    return stats
+
+def get_stats_for_player(playerID):
+    db = sqlite3.connect('databases/player_stats.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    stats = cursor.execute("SELECT * FROM PlayerStats WHERE id = ?", (playerID,)).fetchone()
+    stat_dict = dict_from_row(stats)
+
+    cursor.close()
+    db.close()
+
+    return stat_dict
+
+def new_user(usr, pswd):
+    db = sqlite3.connect('databases/users.sql')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+    new_id = get_new_id()
+    cursor.execute("INSERT INTO Users (id, userName, password) VALUES (?, ?, ?)", (usr, pswd))
+
+
+print(get_fav_players('admins'))
+
+
+
+
 
 
 

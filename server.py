@@ -11,8 +11,8 @@ app.config['CORS_SUPPORTS_CREDENTIALS'] = True
 
 stupid_cors = "Access-Control-Allow-Origin"
 
+# returns the top 30 players for a given stat
 @app.route("/top10/<stat>/", methods=["GET"])
-
 def top_players(stat):
     print(stat)
     if request.method == "GET":
@@ -21,9 +21,8 @@ def top_players(stat):
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
-
+# returns all of the teams' stats
 @app.route("/teams/", methods=["GET"])
-
 def teams():
     if request.method == "GET":
         teams = db_util.get_teams()
@@ -31,8 +30,8 @@ def teams():
         response.headers.add(stupid_cors, "*")
         return response
 
+# returns a player given their id
 @app.route("/players/<playerID>/", methods=["GET"])
-
 def get_player(playerID):
     if request.method == "GET":
         player_info = db_util.get_player_by_id(playerID)
@@ -40,17 +39,18 @@ def get_player(playerID):
         response.headers.add(stupid_cors, "*")
         return response
 
+# returns a teams' roster
 @app.route("/teams/<teamID>/")
-
 def get_roster(teamID):
     if request.method == "GET":
         roster = db_util.get_roster(teamID)
         response = jsonify(roster)
         response.headers.add(stupid_cors, "*")
         return response
+
+# returns true if a user is valid
 @app.route("/validateuser/", methods=["POST", "GET", "OPTIONS"])
 @cross_origin(origins='*')
-
 def validate_user():
     if request.method == "POST":
         data = request.json
@@ -58,18 +58,52 @@ def validate_user():
         password = data["password"]
         print("Got username " + userName + " and password " + password)
         valid: bool = db_util.user_exists(userName) and db_util.validate_user(userName, password)
-        print("User is valid: ", valid)
+
+        if valid:
+            user = userName
         dict_to_send = {"is_valid" : valid}
         json_to_send = jsonify(dict_to_send)
         return json_to_send
 
-@app.route("/last5/<playerID>/", methods=["GET"])
+# adds a new favorite player to the db
+@app.route("/newfavplayer/", methods=["POST", "GET"])
+def add_new_fav_player():
+    if request.method == 'POST':
+        data = request.json
+        user = data['userName']
+        playerID = data['player']
+        db_util.new_fav_player(user, playerID)
 
+# returns all favorite players for a user
+@app.route("/favplayers/<userName>/", methods=["GET"])
+def fav_players(userName):
+    if request.method == "GET":
+        players_list = db_util.get_fav_players(userName)
+        if players_list == None:
+            response = jsonify({"found": False})
+            response.headers.add(stupid_cors, "*")
+        # if there is a valid list of players
+        response = jsonify(players_list)
+        response.headers.add(stupid_cors, "*")
+        return response
+        
+
+# returns the last 5 game logs for a player
+@app.route("/last5/<playerID>/", methods=["GET"])
 def last_5_games(playerID):
     if request.method == "GET":
-        last5_list = gamelogs.get_game_logs(playerID)
+        last5_list = gamelogs.get_last5(playerID)
         response = jsonify(last5_list)
         return response
+
+# adds a user to the db
+@app.route("/signup/", methods=["POST", "GET"])
+def new_account():
+    if request.method == "POST":
+        data = request.json
+        username = data['userName']
+        password = data['password']
+        db_util.new_user(username, password)
 
 
 @app.after_request
@@ -79,6 +113,9 @@ def after_request(response):
     header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
     header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
     return response
+
+
+
 
 
 

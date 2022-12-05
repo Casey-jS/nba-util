@@ -66,11 +66,13 @@ def test_get_stats(team_name):
 
     stats = db.execute("SELECT * FROM TeamStats WHERE teamName = ?", (team_name,)).fetchone()
 
-    format = ["ID: ", "Name: ", "W: ", "L: ", "W%: ", "3%: ", "+/-: ", "PTS: ", "RANK: "]
+    format = ["ID: ", "Name: ", "W: ", "L: ", "W%: ", "PPG: ", "3%: ", "+/-: ", "RANK: "]
 
     for i in range(9):
         print(format[i] + str(stats[i]))
 
-test_get_stats("Phoenix Suns")
 
-# create_team_db()
+
+#create_team_db()
+
+test_get_stats("Boston Celtics")
