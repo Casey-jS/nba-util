@@ -2,7 +2,7 @@ from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.static import players
 import sqlite3
 import time
-
+import random
 
 headers =  {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
@@ -16,7 +16,7 @@ def get_last5(id):
     lst = []
     for i in range(5):
 
-        log = playergamelog.PlayerGameLog(player_id=2544, headers = headers, timeout=100).get_dict()['resultSets'][0]['rowSet'][i]
+        log = playergamelog.PlayerGameLog(player_id=id, headers = headers, timeout=100).get_dict()['resultSets'][0]['rowSet'][i]
         print("got a game log")
         game_dict = {
             "result" : log[5],
@@ -30,22 +30,10 @@ def get_last5(id):
             "blk" : log[21]
         }
         lst.append(game_dict)
-        
-        time.sleep(.6)
+        time_to_sleep = random.uniform(0.7, 1.8)
+        time.sleep(time_to_sleep)
 
     return lst
-
-"""
-playerID int not null,
-opp text not null,
-wl text not null,
-fg text not null,
-threes text not null,
-reb int not null,
-ast int not null,
-stl int not null,
-blk int not null
-"""
 
 def create_logs_db():
     

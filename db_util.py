@@ -157,6 +157,52 @@ def get_teamID_by_name(name: str) -> int:
     return id
 
 
+def get_team_log(teamID):
+    db = sqlite3.connect('databases/team_logs.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    games = cursor.execute("SELECT * FROM TeamLogs WHERE teamID = ?", (teamID,)).fetchall()
+
+    lst = []
+
+    for row in games:
+        d = dict_from_row(row)
+        lst.append(d)
+    
+    return lst
+
+
+def get_standings(conference):
+    db = sqlite3.connect('databases/standings.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    standings = cursor.execute("SELECT * FROM Standings WHERE conf = ? ORDER BY lrank LIMIT 10", (conference,)).fetchall()
+    lst = []
+    for row in standings:  
+        d = dict_from_row(row)
+        lst.append(d)
+
+    return lst
+
+print(get_standings("West"))
+
+
+""" d = {
+            "teamID" : row[0],
+            "teamName" : row[1],
+            "record" : row[4],
+            "home" : row[5],
+            "away" : row[6],
+            "last10": row[7]
+        } """
+
+
+
+
+
+
 
 
 

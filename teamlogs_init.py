@@ -13,11 +13,6 @@ for key in keys:
     print(str(i) + ": " + str(key))
     i += 1 """
 
-
-
-
-
-
 def insert_team_logs(db, teamID):
 
     

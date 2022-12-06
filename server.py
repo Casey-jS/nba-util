@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import db_util as db_util
 from flask_cors import CORS, cross_origin
-import gamelogs
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/.*": {"origins": "http://localhost"}})
@@ -88,13 +87,13 @@ def fav_players(userName):
         return response
         
 
-# returns the last 5 game logs for a player
+""" # returns the last 5 game logs for a player
 @app.route("/last5/<playerID>/", methods=["GET"])
 def last_5_games(playerID):
     if request.method == "GET":
         last5_list = gamelogs.get_last5(playerID)
         response = jsonify(last5_list)
-        return response
+        return response """
 
 # adds a user to the db
 @app.route("/signup/", methods=["POST", "GET"])
@@ -104,6 +103,29 @@ def new_account():
         username = data['userName']
         password = data['password']
         db_util.new_user(username, password)
+
+@app.route("/teamlogs/<teamID>/", methods=["GET"])
+
+def get_teamlogs(teamID):
+    if request.method == "GET":
+        last5_list = db_util.get_team_log(teamID)
+        response = jsonify(last5_list)
+        response.headers.add(stupid_cors, "*")
+        return response
+
+@app.route("/standings/<conf>/", methods=["GET"])
+def get_west_standings(conf):
+    conference = ""
+    if conf == '0':
+        conference = 'West'
+    else:
+        conference = 'East'
+
+    print("Getting stats for " + conference + " teams")
+    standings = db_util.get_standings(conference)
+    response = jsonify(standings)
+    response.headers.add(stupid_cors, "*")
+    return response
 
 
 @app.after_request
