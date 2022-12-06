@@ -10,7 +10,7 @@ def get_db(database):
 def dict_from_row(row):
     return dict(zip(row.keys(), row))
 
-def get_league_leaders(stat) -> list[dict]:
+def get_league_leaders(stat):
     db = get_db("player_stats")
     cursor = db.cursor()
     query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 30"
@@ -148,7 +148,14 @@ def new_user(usr, pswd):
     cursor.execute("INSERT INTO Users (id, userName, password) VALUES (?, ?, ?)", (usr, pswd))
 
 
-print(get_fav_players('admins'))
+def get_teamID_by_name(name: str) -> int:
+    db = sqlite3.connect('databases/team_stats.db')
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    id = cursor.execute("SELECT id FROM TeamStats WHERE teamName = ?", (name,)).fetchone()[0]
+    return id
+
 
 
 

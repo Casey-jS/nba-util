@@ -1,4 +1,4 @@
-from nba_api.stats.endpoints import playergamelogs
+from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.static import players
 import sqlite3
 import time
@@ -16,10 +16,7 @@ def get_last5(id):
     lst = []
     for i in range(5):
 
-        
-
-        
-        log = playergamelogs.PlayerGameLogs(player_id_nullable=2544, headers = headers, timeout=100).get_dict()['resultSets'][0]['rowSet'][i]
+        log = playergamelog.PlayerGameLog(player_id=2544, headers = headers, timeout=100).get_dict()['resultSets'][0]['rowSet'][i]
         print("got a game log")
         game_dict = {
             "result" : log[5],
@@ -33,7 +30,7 @@ def get_last5(id):
             "blk" : log[21]
         }
         lst.append(game_dict)
-
+        
         time.sleep(.6)
 
     return lst
