@@ -10,6 +10,16 @@ app.config['CORS_SUPPORTS_CREDENTIALS'] = True
 
 stupid_cors = "Access-Control-Allow-Origin"
 
+global_user = ""
+
+@app.route("/getuser/")
+
+def get_user():
+    if request.method== "GET":
+        response = jsonify({"user" : global_user})
+        response.headers.add(stupid_cors, "*")
+        return response
+
 # returns the top 30 players for a given stat
 @app.route("/top10/<stat>/", methods=["GET"])
 def top_players(stat):
@@ -51,6 +61,7 @@ def get_roster(teamID):
 @app.route("/validateuser/", methods=["POST", "GET", "OPTIONS"])
 @cross_origin(origins='*')
 def validate_user():
+    global global_user
     if request.method == "POST":
         data = request.json
         userName = data["username"]
@@ -59,8 +70,10 @@ def validate_user():
         valid: bool = db_util.user_exists(userName) and db_util.validate_user(userName, password)
 
         if valid:
-            user = userName
-        dict_to_send = {"is_valid" : valid}
+             global_user = userName
+             dict_to_send = {"is_valid" : valid, "user" : userName}
+        else:
+            dict_to_send = {"is_valid" : valid, "user" : ""}
         json_to_send = jsonify(dict_to_send)
         return json_to_send
 
@@ -72,6 +85,7 @@ def add_new_fav_player():
         user = data['userName']
         playerID = data['player']
         db_util.new_fav_player(user, playerID)
+        return jsonify({"success" : True})
 
 # returns all favorite players for a user
 @app.route("/favplayers/<userName>/", methods=["GET"])
@@ -81,6 +95,7 @@ def fav_players(userName):
         if players_list == None:
             response = jsonify({"found": False})
             response.headers.add(stupid_cors, "*")
+            return response
         # if there is a valid list of players
         response = jsonify(players_list)
         response.headers.add(stupid_cors, "*")
@@ -103,6 +118,14 @@ def new_account():
         username = data['userName']
         password = data['password']
         db_util.new_user(username, password)
+
+@app.route("/signout/")
+def sign_out():
+    global global_user
+    global_user = ""
+    response = jsonify({"signout" : True})
+    response.headers.add(stupid_cors, "*")
+    return response
 
 @app.route("/teamlogs/<teamID>/", methods=["GET"])
 
