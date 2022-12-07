@@ -20,6 +20,14 @@ def get_user():
         response.headers.add(stupid_cors, "*")
         return response
 
+@app.route("/top4/<stat>/")
+def top4_players(stat):
+    if request.method == "GET":
+        top4 = db_util.get_top4_stat(stat)
+        response = jsonify(top4)
+        response.headers.add(stupid_cors, "*")
+        return response
+
 # returns the top 30 players for a given stat
 @app.route("/top10/<stat>/", methods=["GET"])
 def top_players(stat):

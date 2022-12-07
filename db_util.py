@@ -188,6 +188,19 @@ def get_standings(conference):
 
 print(get_standings("West"))
 
+def get_top4_stat(stat):
+    db = get_db("player_stats")
+    cursor = db.cursor()
+    top4 = cursor.execute("SELECT id, name, " + stat + " FROM PlayerStats ORDER BY " + stat + "DESC LIMIT 4").fetchall()
+
+    lst = []
+    for player in top4:
+        d = dict_from_row(player)
+        lst.append(d)
+    
+    return lst
+
+
 
 """ d = {
             "teamID" : row[0],
