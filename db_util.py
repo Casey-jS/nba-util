@@ -50,6 +50,14 @@ def get_roster(teamID):
 
     return lst
 
+def get_team_info(teamID):
+    db = get_db("team_stats")
+    cursor = db.cursor()
+    info = cursor.execute("select teamName, wrank, wins, losses from TeamStats where id = ?", (teamID,)).fetchone()
+    return dict_from_row(info)
+
+
+
 def get_player_by_id(id):
     db = get_db("player_stats")
     cursor = db.cursor()
@@ -191,7 +199,7 @@ print(get_standings("West"))
 def get_top4_stat(stat):
     db = get_db("player_stats")
     cursor = db.cursor()
-    top4 = cursor.execute("SELECT id, name, " + stat + " FROM PlayerStats ORDER BY " + stat + "DESC LIMIT 4").fetchall()
+    top4 = cursor.execute("SELECT id, fullName, " + stat + " FROM PlayerStats ORDER BY " + stat + " DESC LIMIT 4").fetchall()
 
     lst = []
     for player in top4:
@@ -200,16 +208,6 @@ def get_top4_stat(stat):
     
     return lst
 
-
-
-""" d = {
-            "teamID" : row[0],
-            "teamName" : row[1],
-            "record" : row[4],
-            "home" : row[5],
-            "away" : row[6],
-            "last10": row[7]
-        } """
 
 
 

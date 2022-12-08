@@ -24,6 +24,7 @@ def get_user():
 def top4_players(stat):
     if request.method == "GET":
         top4 = db_util.get_top4_stat(stat)
+        print("Got request for top4 stats")
         response = jsonify(top4)
         response.headers.add(stupid_cors, "*")
         return response
@@ -44,6 +45,15 @@ def teams():
     if request.method == "GET":
         teams = db_util.get_teams()
         response = jsonify(teams)
+        response.headers.add(stupid_cors, "*")
+        return response
+
+# returns common team info (name, wins, losses)
+@app.route("/teaminfo/<teamID>/")
+def team_info(teamID):
+    if request.method == "GET":
+        info = db_util.get_team_info(teamID)
+        response = jsonify(info)
         response.headers.add(stupid_cors, "*")
         return response
 
