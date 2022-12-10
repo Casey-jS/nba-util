@@ -194,7 +194,6 @@ def get_standings(conference):
 
     return lst
 
-print(get_standings("West"))
 
 def get_top4_stat(stat):
     db = get_db("player_stats")
@@ -207,6 +206,15 @@ def get_top4_stat(stat):
         lst.append(d)
     
     return lst
+
+def is_favorited(userName, playerID):
+    db = get_db("fav_players")
+    cursor = db.cursor()
+    exists = cursor.execute("SELECT * FROM FavPlayers WHERE userName = ? and playerID = ?", (userName, playerID))
+
+    if exists.fetchone():
+        return True
+    return False
 
 
 

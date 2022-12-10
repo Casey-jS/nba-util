@@ -168,6 +168,16 @@ def get_west_standings(conf):
     response.headers.add(stupid_cors, "*")
     return response
 
+@app.route("/isfavorited/", methods=["GET", "POST"])
+
+def is_favorited():
+    if request.method == "POST":
+        data = request.json
+        user = data['userName']
+        playerID = data['playerID']
+        exists = db_util.is_favorited(user, playerID)
+        return jsonify({"is_favorited", exists})
+
 
 @app.after_request
 def after_request(response):
