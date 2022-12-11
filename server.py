@@ -132,20 +132,29 @@ def last_5_games(playerID):
 
 # adds a user to the db
 @app.route("/signup/", methods=["POST", "GET"])
+
 def new_account():
+    global global_user
     if request.method == "POST":
         data = request.json
         username = data['userName']
         password = data['password']
-        db_util.new_user(username, password)
+        response = db_util.new_user(username, password)
+        if response['valid'] == True:
+            global_user = username
+        j = jsonify(response)
+        j.headers.add(stupid_cors, "*")
+        return j
 
 @app.route("/signout/")
 def sign_out():
-    global global_user
-    global_user = ""
-    response = jsonify({"signout" : True})
-    response.headers.add(stupid_cors, "*")
-    return response
+    if request.method =="GET":
+        print("Got the signout request")
+        global global_user
+        global_user = ""
+        response = jsonify({"signout" : True})
+        response.headers.add(stupid_cors, "*")
+        return response
 
 @app.route("/teamlogs/<teamID>/", methods=["GET"])
 

@@ -141,13 +141,22 @@ def get_stats_for_player(playerID):
 
     return stat_dict
 
+
 def new_user(usr, pswd):
 
     db = get_db("users")
+    if (user_exists(usr)):
+        return {"valid" : False, "message" : "A user with this name already exists."}
+    if len(usr) < 4:
+        return {"valid" : False, "message" : "Username must be longer than 4 characters"}
 
+    if len(pswd) < 4:
+        return {"valid" : False, "message" : "Password must be longer than 4 characters"}
+    
     cursor = db.cursor()
     new_id = get_new_id()
     cursor.execute("INSERT INTO Users (id, userName, password) VALUES (?, ?, ?)", (new_id, usr, pswd))
+    return {"valid" : True, "message" : "Welcome!"}
 
 
 def get_teamID_by_name(name: str) -> int:
