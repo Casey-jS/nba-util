@@ -66,6 +66,7 @@ def get_player_by_id(id):
     player_dict = dict_from_row(player)
     return player_dict
 
+
 def connect_users():
     db = sqlite3.connect("databases/users.db")
     db.row_factory = sqlite3.Row
@@ -215,6 +216,50 @@ def is_favorited(userName, playerID):
     if exists.fetchone():
         return True
     return False
+
+def get_search_results(text):
+    db = get_db("player_stats")
+    cursor = db.cursor()
+    top5 = cursor.execute("SELECT id, fullName FROM PlayerStats WHERE fullName like '%" + text + "%' ORDER BY ppg DESC LIMIT 5").fetchall()
+    lst = []
+    for row in top5:
+        d = dict_from_row(row)
+        lst.append(d)
+
+    return lst
+
+def get_top_bets():
+    db = get_db("bets")
+    cursor = db.cursor()
+    top5 = cursor.execute("SELECT * from Bets LIMIT 5").fetchall()
+    lst = []
+    for row in top5:
+        d = dict_from_row(row)
+        lst.append(d)
+
+    return lst
+
+def new_bet(user, player, playerID, amount, stat, opp):
+    db = get_db("bets")
+
+    insert_string = "INSERT INTO Bets (user, playerID, playerName, stat, amount, opp) VALUES (?, ?, ?, ?, ?, ?)"
+    db.execute(insert_string, (user, playerID, player, stat, float(amount), opp))
+    print("Added a new bet to the database")
+    db.commit()
+    db.close()
+
+def get_bets(user):
+    db = get_db("bets")
+    cursor = db.cursor()
+    bets = cursor.execute("SELECT * FROM Bets WHERE user = ?", (user,)).fetchall()
+
+    lst = []
+    for row in bets:
+        d = dict_from_row(row)
+        lst.append(d)
+
+    return lst
+
 
 
 

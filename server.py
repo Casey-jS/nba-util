@@ -176,7 +176,45 @@ def is_favorited():
         user = data['userName']
         playerID = data['playerID']
         exists = db_util.is_favorited(user, playerID)
-        return jsonify({"is_favorited", exists})
+        return jsonify({"is_favorited": exists})
+
+@app.route("/results/<typed>/", methods=["GET", "POST"])
+def get_search_results(typed):
+    if request.method == "POST":
+        data = request.json
+        text = data['text']
+        results = db_util.get_search_results(text)
+
+@app.route("/toppicks/")
+
+def top_picks():
+    if request.method == "GET":
+        top5 = db_util.get_top_bets()
+        response = jsonify(top5)
+        response.headers.add(stupid_cors, "*")
+        return response
+
+@app.route("/bets/new/", methods=["GET", "POST"])
+
+def new_bet():
+    if request.method == "POST":
+        data = request.json
+        player = data['player']
+        playerID = data['playerID']
+        user = data['user']
+        amount = float(data['amount'])
+        opp = data['opp']
+        stat = data['stat']
+        db_util.new_bet(user, player, playerID, amount, stat, opp)
+        return jsonify({"added": True})
+
+@app.route("/bets/<user>/", methods=["GET"])
+def get_bets(user):
+    if request.method == "GET":
+        bets = db_util.get_bets(user)
+        response = jsonify(bets)
+        response.headers.add(stupid_cors, "*")
+        return response
 
 
 @app.after_request
