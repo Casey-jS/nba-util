@@ -6,6 +6,12 @@ def get_db(database):
     db.row_factory = sqlite3.Row
     return db
 
+def get_list_of_dicts(rows):
+    lst = []
+    for row in rows:
+        d = dict_from_row(row)
+        lst.append(d)
+    return lst
 
 def dict_from_row(row):
     return dict(zip(row.keys(), row))
@@ -15,14 +21,8 @@ def get_league_leaders(stat):
     cursor = db.cursor()
     query = "SELECT * FROM PlayerStats ORDER BY " + stat + " desc LIMIT 30"
     top30 = cursor.execute(query).fetchall()
-    cursor.close()
-    db.close()
+    lst = get_list_of_dicts(top30)
 
-    lst = []
-    for player in top30:
-        player_dict = dict_from_row(player)
-        lst.append(player_dict)
-    
     return lst
 
 def get_teams():
@@ -31,10 +31,7 @@ def get_teams():
     query = "SELECT * FROM TeamStats ORDER BY wrank asc"
     teams = cursor.execute(query).fetchall()
     cursor.close()
-    lst = []
-    for team in teams:
-        team_dict = dict_from_row(team)
-        lst.append(team_dict)
+    lst = get_list_of_dicts(teams)
     return lst
 
 def get_roster(teamID):
@@ -43,11 +40,7 @@ def get_roster(teamID):
     query = "SELECT * FROM PlayerStats WHERE teamID = ? ORDER BY fantasyRank asc"
     roster = cursor.execute(query, (teamID,)).fetchall()
     cursor.close()
-    lst = []
-    for player in roster:
-        roster_dict = dict_from_row(player)
-        lst.append(roster_dict)
-
+    lst = get_list_of_dicts(roster)
     return lst
 
 def get_team_info(teamID):
@@ -117,13 +110,13 @@ def new_fav_player(user, player):
     db.close()
 
 def get_fav_players(userName):
-    db = sqlite3.connect('databases/fav_players.db')
-    db.row_factory = sqlite3.Row
+    print("Getting favorite players for user "+ userName)
+    db = get_db("fav_players")
     cursor = db.cursor()
     players = cursor.execute("SELECT * FROM FavPlayers WHERE userName = ?", (userName,)).fetchall()
 
     if len(players) == 0:
-        return None
+        return False
     lst = []
     for player in players:
         player_id = dict_from_row(player)['playerID']
@@ -138,8 +131,7 @@ def get_fav_players(userName):
     return stats
 
 def get_stats_for_player(playerID):
-    db = sqlite3.connect('databases/player_stats.db')
-    db.row_factory = sqlite3.Row
+    db = get_db("player_stats")
     cursor = db.cursor()
     stats = cursor.execute("SELECT * FROM PlayerStats WHERE id = ?", (playerID,)).fetchone()
     stat_dict = dict_from_row(stats)
@@ -150,36 +142,26 @@ def get_stats_for_player(playerID):
     return stat_dict
 
 def new_user(usr, pswd):
-    db = sqlite3.connect('databases/users.sql')
-    db.row_factory = sqlite3.Row
+
+    db = get_db("users")
+
     cursor = db.cursor()
     new_id = get_new_id()
-    cursor.execute("INSERT INTO Users (id, userName, password) VALUES (?, ?, ?)", (usr, pswd))
+    cursor.execute("INSERT INTO Users (id, userName, password) VALUES (?, ?, ?)", (new_id, usr, pswd))
 
 
 def get_teamID_by_name(name: str) -> int:
-    db = sqlite3.connect('databases/team_stats.db')
-    db.row_factory = sqlite3.Row
+    db = get_db("team_stats")
     cursor = db.cursor()
-
     id = cursor.execute("SELECT id FROM TeamStats WHERE teamName = ?", (name,)).fetchone()[0]
     return id
 
 
 def get_team_log(teamID):
-    db = sqlite3.connect('databases/team_logs.db')
-    db.row_factory = sqlite3.Row
+    db = get_db("team_logs")
     cursor = db.cursor()
-
     games = cursor.execute("SELECT * FROM TeamLogs WHERE teamID = ?", (teamID,)).fetchall()
-
-    lst = []
-
-    for row in games:
-        d = dict_from_row(row)
-        lst.append(d)
-    
-    return lst
+    return get_list_of_dicts(games)
 
 
 def get_standings(conference):
@@ -188,25 +170,15 @@ def get_standings(conference):
     cursor = db.cursor()
 
     standings = cursor.execute("SELECT * FROM Standings WHERE conf = ? ORDER BY lrank LIMIT 10", (conference,)).fetchall()
-    lst = []
-    for row in standings:  
-        d = dict_from_row(row)
-        lst.append(d)
+    return get_list_of_dicts(standings)
 
-    return lst
 
 
 def get_top4_stat(stat):
     db = get_db("player_stats")
     cursor = db.cursor()
     top4 = cursor.execute("SELECT id, fullName, " + stat + " FROM PlayerStats ORDER BY " + stat + " DESC LIMIT 4").fetchall()
-
-    lst = []
-    for player in top4:
-        d = dict_from_row(player)
-        lst.append(d)
-    
-    return lst
+    return get_list_of_dicts(top4)
 
 def is_favorited(userName, playerID):
     db = get_db("fav_players")
@@ -221,30 +193,18 @@ def get_search_results(text):
     db = get_db("player_stats")
     cursor = db.cursor()
     top5 = cursor.execute("SELECT id, fullName FROM PlayerStats WHERE fullName like '%" + text + "%' ORDER BY ppg DESC LIMIT 5").fetchall()
-    lst = []
-    for row in top5:
-        d = dict_from_row(row)
-        lst.append(d)
-
-    return lst
+    return get_list_of_dicts(top5)
 
 def get_top_bets():
     db = get_db("bets")
     cursor = db.cursor()
     top5 = cursor.execute("SELECT * from Bets LIMIT 5").fetchall()
-    lst = []
-    for row in top5:
-        d = dict_from_row(row)
-        lst.append(d)
-
-    return lst
+    return get_list_of_dicts(top5)
 
 def new_bet(user, player, playerID, amount, stat, opp):
     db = get_db("bets")
-
     insert_string = "INSERT INTO Bets (user, playerID, playerName, stat, amount, opp) VALUES (?, ?, ?, ?, ?, ?)"
     db.execute(insert_string, (user, playerID, player, stat, float(amount), opp))
-    print("Added a new bet to the database")
     db.commit()
     db.close()
 
@@ -253,29 +213,4 @@ def get_bets(user):
     cursor = db.cursor()
     bets = cursor.execute("SELECT * FROM Bets WHERE user = ?", (user,)).fetchall()
 
-    lst = []
-    for row in bets:
-        d = dict_from_row(row)
-        lst.append(d)
-
-    return lst
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
+    return get_list_of_dicts(bets)

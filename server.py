@@ -102,6 +102,7 @@ def add_new_fav_player():
         data = request.json
         user = data['userName']
         playerID = data['player']
+        print("Adding " + str(playerID) + " to " + user + " favorites")
         db_util.new_fav_player(user, playerID)
         return jsonify({"success" : True})
 
@@ -110,11 +111,12 @@ def add_new_fav_player():
 def fav_players(userName):
     if request.method == "GET":
         players_list = db_util.get_fav_players(userName)
-        if players_list == None:
+        if players_list == False:
             response = jsonify({"found": False})
             response.headers.add(stupid_cors, "*")
             return response
         # if there is a valid list of players
+        players_list.append({"found" : True})
         response = jsonify(players_list)
         response.headers.add(stupid_cors, "*")
         return response
